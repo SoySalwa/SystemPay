@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/settings.png</file>
+        <file>icons/profile.png</file>
+        <file>icons/logout.png</file>
+        <file>icons/cash.png</file>
+        <file>icons/restart.png</file>
+        <file>icons/Logo.png</file>
+        <file>icons/history.png</file>
+        <file>icons/card.png</file>
+        <file>icons/add.png</file>
+    </qresource>
+    <qresource prefix="/av">
+        <file alias="Furina">av/Furina.png</file>
+        <file alias="Furina_Av">av/Furina_Av.png</file>
+    </qresource>
+</RCC>

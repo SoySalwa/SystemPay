@@ -22,8 +22,15 @@ QPushButton *SystemButtons::createButton(const QString &icon_path, const QString
     {
         addStudentBtn = button;
     }
-    connect(button, &QPushButton::clicked, button, [=]()
+
+    if (objectName == "Settings")
+    {
+        settingsBtn = button;
+    }
+
+    connect(button, &QPushButton::clicked, this, [=]()
             {
+            qDebug() << "[SystemButtons] button clicked, objectName =" << button->objectName();
 
         if (active_button && active_button != button) {
             active_button->setChecked(false);

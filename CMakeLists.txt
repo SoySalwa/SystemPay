@@ -25,12 +25,14 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     # UI
     src/ui/app/mainwindow.cc src/ui/app/mainwindow.h
     src/utils/DonutWidget.cc src/utils/DonutWidget.h
+    src/ui/app/settings/Settings.cc src/ui/app/settings/Settings.h
+    src/ui/app/settings/ThemeManager.h 
     # Eventos
     #src/events/eventhandlers.cpp src/events/eventhandlers.h
     #src/events/mouseevent.cpp src/events/mouseevent.h
     # Styles
     src/styles/ButtonStyle.h
-
+    src/styles/WidgetStyle.h
     # Database
    # src/database/MongoConnection.cpp src/database/MongoConnection.h
 
@@ -68,6 +70,7 @@ target_include_directories(system PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/app
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/app/settings
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/students
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/window
     ${CMAKE_CURRENT_SOURCE_DIR}/src/events

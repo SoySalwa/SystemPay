@@ -1,12 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "Settings.h"
+
 #include <QMainWindow>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QTableView>
 #include <QHeaderView>
+class SystemButtons;
 
 class QWidget;
 class QPushButton;
@@ -21,6 +24,8 @@ public:
 private:
     QWidget *mainWidget;
     QHBoxLayout *buttonLayout;
+    SystemButtons *system_buttons;
+    Settings *settings;
 };
 
 #endif // MAINWINDOW_H

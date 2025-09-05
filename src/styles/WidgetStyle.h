@@ -1,6 +1,16 @@
 #include <QString>
+#include <QColor>
 
 namespace WidgetStyle
 {
-    // Unused
+    inline QString widgetNavBarColor(const QColor &bgColor)
+    {
+        return QString(R"(
+            QWidget {
+                background-color: %1;
+                border-radius: 6px;
+            }
+        )")
+            .arg(bgColor.name());
+    }
 }

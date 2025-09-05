@@ -15,6 +15,7 @@ class SystemButtons : QObject
     Q_OBJECT
 private:
     QPushButton *addStudentBtn;
+    QPushButton *settingsBtn;
     QVBoxLayout *mainLayout;
     QWidget *contentArea;
 

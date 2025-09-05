@@ -22,4 +22,17 @@ namespace ButtonStyle
             }
         )";
     };
+
+    inline QString buttonNavBarColor()
+    {
+        return R"(
+        QPushButton {
+            background-color: none;
+            border:  none;
+            }
+        QPushButton:hover {
+            background-color: #454545;
+        }
+        )";
+    }
 }

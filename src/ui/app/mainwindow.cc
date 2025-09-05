@@ -1,7 +1,9 @@
 #include "mainwindow.h"
-#include "systembuttons.h"
 #include "DonutWidget.h"
 #include "ButtonStyle.h"
+#include "WidgetStyle.h"
+#include "systembuttons.h"
+#include "ThemeManager.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -15,23 +17,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     buttonLayout = new QHBoxLayout(buttons);
     buttonLayout->setContentsMargins(10, 10, 0, 0);
     mainLayout->addWidget(buttons, 0, Qt::AlignCenter);
-    SystemButtons system_buttons = SystemButtons(this);
-    QPushButton *addStudentbtn = system_buttons.createButton(":/icons/add.png", "Inscribir Estudiante", "AddStudent", []()
-                                                             {
-                                                                 // This lambda is intentionally left empty for now.
-                                                             });
-    QPushButton *EnrollStudent = system_buttons.createButton(":/icons/restart.png", "Reinscribir Estudiante", "UpdStudent", []()
-                                                             {
-                                                                 // This lambda is intentionally left empty for now.
-                                                             });
-    QPushButton *updStudentBtn = system_buttons.createButton(":/icons/card.png", "Realizar Pagos", "ToPay", []()
-                                                             {
-                                                                 // This lambda is intentionally left empty for now.
-                                                             });
-    QPushButton *reportsBtn = system_buttons.createButton(":/icons/history.png", "Reportes", "Reports", []()
-                                                          {
-                                                              // This lambda is intentionally left empty for now.
-                                                          });
+    system_buttons = new SystemButtons(this);
+    QPushButton *addStudentbtn = system_buttons->createButton(":/icons/add.png", "Inscribir Estudiante", "AddStudent", []()
+                                                              {
+                                                                  // This lambda is intentionally left empty for now.
+                                                              });
+    QPushButton *EnrollStudent = system_buttons->createButton(":/icons/restart.png", "Reinscribir Estudiante", "UpdStudent", []()
+                                                              {
+                                                                  // This lambda is intentionally left empty for now.
+                                                              });
+    QPushButton *updStudentBtn = system_buttons->createButton(":/icons/card.png", "Realizar Pagos", "ToPay", []()
+                                                              {
+                                                                  // This lambda is intentionally left empty for now.
+                                                              });
+    QPushButton *reportsBtn = system_buttons->createButton(":/icons/history.png", "Reportes", "Reports", []()
+                                                           {
+                                                               // This lambda is intentionally left empty for now.
+                                                           });
 
     addStudentbtn->setStyleSheet(ButtonStyle::buttonNormalColor());
     EnrollStudent->setStyleSheet(ButtonStyle::buttonNormalColor());
@@ -76,23 +78,40 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     statisLayout->addWidget(notPayWidget);
 
     QWidget *toolBar = new QWidget(mainWidget);
+    toolBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    toolBar->setContentsMargins(0, 0, 0, 0);
+    const Theme &t = ThemeManager::instance()->allThemes()[ThemeManager::instance()->currentTheme()];
+    toolBar->setStyleSheet(WidgetStyle::widgetNavBarColor(t.toolBarColor));
+
     QVBoxLayout *toolLayout = new QVBoxLayout(toolBar);
-    QPushButton *profileBtn = system_buttons.createButton(":/icons/profile.png", "", "Profile", []()
+    settings = new Settings(this);
+    QPushButton *profileBtn = system_buttons->createButton(":/icons/profile.png", "", "Profile", []() { // This lambda is intentionally left empty for now.
+    });
+    QPushButton *payBtn = system_buttons->createButton(":/icons/cash.png", "", "Pay", []()
+                                                       {
+                                                           // This lambda is intentionally left empty for now.
+                                                       });
+    QPushButton *settingsBtn = system_buttons->createButton(":/icons/settings.png", "", "Settings", [this]()
+                                                            {
+        QDialog *settingsDialog = settings->createAppSettings();
+        settingsDialog->exec(); });
+    QPushButton *logoutBtn = system_buttons->createButton(":/icons/logout.png", "", "Logout", []()
                                                           {
                                                               // This lambda is intentionally left empty for now.
                                                           });
-    QPushButton *payBtn = system_buttons.createButton(":/icons/cash.png", "", "Pay", []()
-                                                      {
-                                                          // This lambda is intentionally left empty for now.
-                                                      });
-    QPushButton *settingsBtn = system_buttons.createButton(":/icons/settings.png", "", "Settings", []()
-                                                           {
-                                                               // This lambda is intentionally left empty for now.
-                                                           });
-    QPushButton *logoutBtn = system_buttons.createButton(":/icons/logout.png", "", "Logout", []()
-                                                         {
-                                                             // This lambda is intentionally left empty for now.
-                                                         });
+    connect(ThemeManager::instance(), &ThemeManager::themeChanged, this, [=](const QString &theme)
+            {
+        const QColor color = ThemeManager::instance()->allThemes()[theme].iconColor;
+        profileBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/profile.png", color)));
+        payBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/cash.png", color)));
+        settingsBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/settings.png", color)));
+        const Theme &t = ThemeManager::instance()->allThemes()[theme];
+    toolBar->setStyleSheet(WidgetStyle::widgetNavBarColor(t.toolBarColor)); });
+
+    profileBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
+    payBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
+    settingsBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
+    logoutBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
 
     DonutWidget *donut = new DonutWidget(this);
 

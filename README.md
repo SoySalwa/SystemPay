@@ -24,6 +24,24 @@ Está pensado para ser un sistema eficiente y de calidad para el Centro Educativ
 
 ---
 
+## Compilar en Windows
+### Requisitos
+    MinGW con compatible con Qt6
+    MongoCXX
+
+```bash
+git clone --recursive https://github.com/mongodb/mongo-cxx-driver.git
+cmake -G "MinGW Makefiles" -DCMAKE_INSTALL_PREFIX=C:/mongo-cxx-driver ../mongo-cxx-driver
+cmake --build . --config Release --target install
+```
+Luego en el proyecto
+
+```bash
+cmake -G "MinGW Makefiles" -S . -B build
+cmake --build build
+```
+---
+
 ## Requisitos del Sistema
 
 - Sistema Operativo: Windows 10 o Superior

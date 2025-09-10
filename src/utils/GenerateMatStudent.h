@@ -10,13 +10,16 @@
 #include <cctype>
 #include <QRegularExpression>
 
-class StudentIDGenerator {
+class StudentIDGenerator
+{
 public:
-    StudentIDGenerator() {
+    StudentIDGenerator()
+    {
         usedGradeCodes.clear();
     }
 
-    QString generateID(const QString& grade, int gradeNumber, int studentCount) {
+    QString generateID(const QString &grade, int gradeNumber, int studentCount)
+    {
         int year = QDate::currentDate().year();
         QString yearPart = QString::number(year).right(2);
         QString gradeCode = getUniqueLetterCode(grade);
@@ -28,19 +31,25 @@ public:
 private:
     QSet<QString> usedGradeCodes;
 
-    QString getUniqueLetterCode(const QString& grade) {
+    QString getUniqueLetterCode(const QString &grade)
+    {
         static QString baseCode = grade.toUpper().remove(QRegularExpression("[^A-Z]")); // Convertir a mayúsculas y eliminar caracteres no alfabéticos
-        if (baseCode.length() < 4) {
+        if (baseCode.length() < 4)
+        {
             baseCode = baseCode.leftJustified(4, 'X'); // Rellenar con 'X' si es menor a 4 caracteres
-        } else {
+        }
+        else
+        {
             baseCode = baseCode.left(4); // Limitar a 4 caracteres si es mayor a 4
         }
 
         QString generatedCode;
         int suffix = 0;
-        do {
+        do
+        {
             generatedCode = baseCode;
-            if (suffix > 0) {
+            if (suffix > 0)
+            {
                 // Si ya se usó el código base, ajustar las últimas letras para mantener unicidad
                 QString suffixStr = QString::number(suffix, 36).toUpper(); // Convertir número a base 36 (usa letras y números)
                 generatedCode = generatedCode.left(4 - suffixStr.length()) + suffixStr;

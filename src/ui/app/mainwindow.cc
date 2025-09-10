@@ -3,131 +3,153 @@
 #include "ButtonStyle.h"
 #include "WidgetStyle.h"
 #include "systembuttons.h"
-#include "ThemeManager.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    mainWidget = new QWidget(this);
-    setCentralWidget(mainWidget);
+        setupMainUI();
+        setupConnections();
+        const Theme &t = ThemeManager::instance()->allThemes()[ThemeManager::instance()->currentTheme()];
+        applyThemesWidgets(t);
+}
 
-    QWidget *buttons = new QWidget(mainWidget);
-    buttons->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+void MainWindow::setupMainUI()
+{
+        mainWidget = new QWidget(this);
+        setCentralWidget(mainWidget);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
-    buttonLayout = new QHBoxLayout(buttons);
-    buttonLayout->setContentsMargins(10, 10, 0, 0);
-    mainLayout->addWidget(buttons, 0, Qt::AlignCenter);
-    system_buttons = new SystemButtons(this);
-    QPushButton *addStudentbtn = system_buttons->createButton(":/icons/add.png", "Inscribir Estudiante", "AddStudent", []()
-                                                              {
-                                                                  // This lambda is intentionally left empty for now.
-                                                              });
-    QPushButton *EnrollStudent = system_buttons->createButton(":/icons/restart.png", "Reinscribir Estudiante", "UpdStudent", []()
-                                                              {
-                                                                  // This lambda is intentionally left empty for now.
-                                                              });
-    QPushButton *updStudentBtn = system_buttons->createButton(":/icons/card.png", "Realizar Pagos", "ToPay", []()
-                                                              {
-                                                                  // This lambda is intentionally left empty for now.
-                                                              });
-    QPushButton *reportsBtn = system_buttons->createButton(":/icons/history.png", "Reportes", "Reports", []()
-                                                           {
-                                                               // This lambda is intentionally left empty for now.
-                                                           });
+        QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
 
-    addStudentbtn->setStyleSheet(ButtonStyle::buttonNormalColor());
-    EnrollStudent->setStyleSheet(ButtonStyle::buttonNormalColor());
-    updStudentBtn->setStyleSheet(ButtonStyle::buttonNormalColor());
-    reportsBtn->setStyleSheet(ButtonStyle::buttonNormalColor());
+        // --- Botones principales ---
+        QWidget *buttons = new QWidget(mainWidget);
+        buttonLayout = new QHBoxLayout(buttons);
+        buttonLayout->setContentsMargins(10, 10, 0, 0);
 
-    QWidget *statics = new QWidget(mainWidget);
-    QHBoxLayout *statisLayout = new QHBoxLayout(statics);
+        system_buttons = new SystemButtons(this);
+        homeBtn = system_buttons->createButton(":/icons/home.png", "Interfaz Principal", "home", [this]()
+                                               { contentArea->setCurrentWidget(homeWidget); });
+        addStudentbtn = system_buttons->createButton(":/icons/add.png", "Inscribir Estudiante", "AddStudent", [this]()
+                                                     { contentArea->setCurrentWidget(enrollStudentWidget); });
+        EnrollStudent = system_buttons->createButton(":/icons/restart.png", "Reinscribir Estudiante", "UpdStudent", [this]()
+                                                     { contentArea->setCurrentWidget(enrollStudentWidget); });
+        updStudentBtn = system_buttons->createButton(":/icons/card.png", "Realizar Pagos", "ToPay", [this]()
+                                                     { contentArea->setCurrentWidget(paymentsWidget); });
+        reportsBtn = system_buttons->createButton(":/icons/history.png", "Reportes", "Reports", [this]()
+                                                  { contentArea->setCurrentWidget(reportsWidget); });
 
-    // --- Tabla 1 ---
-    QWidget *recentsWidget = new QWidget(statics);
-    QVBoxLayout *recentsLayout = new QVBoxLayout(recentsWidget);
+        homeBtn->setStyleSheet(ButtonStyle::buttonNormalColor());
+        addStudentbtn->setStyleSheet(ButtonStyle::buttonNormalColor());
+        EnrollStudent->setStyleSheet(ButtonStyle::buttonNormalColor());
+        updStudentBtn->setStyleSheet(ButtonStyle::buttonNormalColor());
+        reportsBtn->setStyleSheet(ButtonStyle::buttonNormalColor());
 
-    QLabel *recentsTitle = new QLabel("Pagos Recientes", recentsWidget);
-    recentsTitle->setAlignment(Qt::AlignCenter);
-    recentsTitle->setStyleSheet("font-size: 14px;background-color: #454545");
+        buttonLayout->addWidget(homeBtn);
+        buttonLayout->addWidget(addStudentbtn);
+        buttonLayout->addWidget(EnrollStudent);
+        buttonLayout->addWidget(updStudentBtn);
+        buttonLayout->addWidget(reportsBtn);
+        mainLayout->addWidget(buttons, 0, Qt::AlignCenter);
 
-    QTableView *recents = new QTableView(recentsWidget);
-    recents->setSelectionBehavior(QAbstractItemView::SelectRows);
-    recents->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        // --- Layout central ---
+        QHBoxLayout *centralLayout = new QHBoxLayout();
 
-    recentsLayout->addWidget(recentsTitle);
-    recentsLayout->addWidget(recents);
+        // --- Toolbar lateral ---
+        toolBar = new QWidget(mainWidget);
+        toolBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+        QVBoxLayout *toolLayout = new QVBoxLayout(toolBar);
 
-    // --- Tabla 2 ---
-    QWidget *notPayWidget = new QWidget(statics);
-    QVBoxLayout *notPayLayout = new QVBoxLayout(notPayWidget);
+        settings = new Settings(this);
+        profileBtn = system_buttons->createButton(":/icons/profile.png", "", "Profile", []() {});
+        payBtn = system_buttons->createButton(":/icons/cash.png", "", "Pay", []() {});
+        settingsBtn = system_buttons->createButton(":/icons/settings.png", "", "Settings", [this]()
+                                                   { settings->createAppSettings()->exec(); });
+        logoutBtn = system_buttons->createButton(":/icons/logout.png", "", "Logout", []() {});
 
-    QLabel *notPayTitle = new QLabel("Tiempo sin Pagar", notPayWidget);
-    notPayTitle->setAlignment(Qt::AlignCenter);
-    notPayTitle->setStyleSheet("font-size: 14px;background-color: #454545");
+        toolLayout->addWidget(profileBtn);
+        toolLayout->addWidget(payBtn);
+        toolLayout->addWidget(settingsBtn);
+        toolLayout->addWidget(logoutBtn);
+        toolLayout->addStretch();
+        // --- Content Area ---
+        contentArea = new QStackedWidget(mainWidget);
+        contentArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    QTableView *notPayStill = new QTableView(notPayWidget);
-    notPayStill->setSelectionBehavior(QAbstractItemView::SelectRows);
-    notPayStill->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        // --- Página Home ---
+        homeWidget = new QWidget();
+        QVBoxLayout *homeLayout = new QVBoxLayout(homeWidget);
 
-    notPayLayout->addWidget(notPayTitle);
-    notPayLayout->addWidget(notPayStill);
+        // Tablas
+        QHBoxLayout *statisLayout = new QHBoxLayout();
 
-    // --- Agregar tablas al layout horizontal ---
-    statisLayout->addWidget(recentsWidget);
-    statisLayout->addWidget(notPayWidget);
+        QWidget *recentsWidget = new QWidget();
 
-    QWidget *toolBar = new QWidget(mainWidget);
-    toolBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    toolBar->setContentsMargins(0, 0, 0, 0);
-    const Theme &t = ThemeManager::instance()->allThemes()[ThemeManager::instance()->currentTheme()];
-    toolBar->setStyleSheet(WidgetStyle::widgetNavBarColor(t.toolBarColor));
+        QVBoxLayout *recentsLayout = new QVBoxLayout(recentsWidget);
 
-    QVBoxLayout *toolLayout = new QVBoxLayout(toolBar);
-    settings = new Settings(this);
-    QPushButton *profileBtn = system_buttons->createButton(":/icons/profile.png", "", "Profile", []() { // This lambda is intentionally left empty for now.
-    });
-    QPushButton *payBtn = system_buttons->createButton(":/icons/cash.png", "", "Pay", []()
-                                                       {
-                                                           // This lambda is intentionally left empty for now.
-                                                       });
-    QPushButton *settingsBtn = system_buttons->createButton(":/icons/settings.png", "", "Settings", [this]()
-                                                            {
-        QDialog *settingsDialog = settings->createAppSettings();
-        settingsDialog->exec(); });
-    QPushButton *logoutBtn = system_buttons->createButton(":/icons/logout.png", "", "Logout", []()
-                                                          {
-                                                              // This lambda is intentionally left empty for now.
-                                                          });
-    connect(ThemeManager::instance(), &ThemeManager::themeChanged, this, [=](const QString &theme)
-            {
+        QLabel *recentsTitle = new QLabel("Pagos Recientes");
+        recentsTitle->setAlignment(Qt::AlignCenter);
+
+        QTableView *recents = new QTableView();
+        recents->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        recents->setSelectionBehavior(QAbstractItemView::SelectRows);
+        recents->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        recents->setMaximumHeight(300);
+
+        recentsLayout->addWidget(recentsTitle);
+        recentsLayout->addWidget(recents);
+
+        QWidget *notPayWidget = new QWidget();
+        QVBoxLayout *notPayLayout = new QVBoxLayout(notPayWidget);
+        QLabel *notPayTitle = new QLabel("Tiempo sin Pagar");
+        notPayTitle->setAlignment(Qt::AlignCenter);
+        QTableView *notPayStill = new QTableView();
+        notPayStill->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        notPayStill->setMaximumHeight(300);
+        notPayStill->setSelectionBehavior(QAbstractItemView::SelectRows);
+        notPayStill->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        notPayLayout->addWidget(notPayTitle);
+        notPayLayout->addWidget(notPayStill);
+
+        statisLayout->addWidget(recentsWidget);
+        statisLayout->addWidget(notPayWidget);
+
+        DonutWidget *donut = new DonutWidget();
+        homeLayout->addLayout(statisLayout);
+        homeLayout->addWidget(donut);
+        contentArea->addWidget(homeWidget);
+
+        enrollStudentWidget = new QWidget();
+        paymentsWidget = new QWidget();
+        reportsWidget = new QWidget();
+
+        contentArea->addWidget(enrollStudentWidget);
+        contentArea->addWidget(paymentsWidget);
+        contentArea->addWidget(reportsWidget);
+
+        centralLayout->addWidget(toolBar);
+        centralLayout->addWidget(contentArea, 1);
+        mainLayout->addLayout(centralLayout, 1);
+}
+
+void MainWindow::setupConnections()
+{
+        connect(ThemeManager::instance(), &ThemeManager::themeChanged, this, [=](const QString &theme)
+                {
         const QColor color = ThemeManager::instance()->allThemes()[theme].iconColor;
         profileBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/profile.png", color)));
         payBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/cash.png", color)));
         settingsBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/settings.png", color)));
         const Theme &t = ThemeManager::instance()->allThemes()[theme];
-    toolBar->setStyleSheet(WidgetStyle::widgetNavBarColor(t.toolBarColor)); });
+        applyThemesWidgets(t); });
+}
 
-    profileBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
-    payBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
-    settingsBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
-    logoutBtn->setStyleSheet(ButtonStyle::buttonNavBarColor());
+void MainWindow::applyThemesWidgets(const Theme &t)
+{
+        toolBar->setStyleSheet(WidgetStyle::widgetNavBarColor(t.toolBarColor));
+        profileBtn->setStyleSheet(ButtonStyle::buttonNavBarColor(t.hvColor));
+        payBtn->setStyleSheet(ButtonStyle::buttonNavBarColor(t.hvColor));
+        settingsBtn->setStyleSheet(ButtonStyle::buttonNavBarColor(t.hvColor));
+        logoutBtn->setStyleSheet(ButtonStyle::buttonNavBarColor(t.hvColor));
 
-    DonutWidget *donut = new DonutWidget(this);
-
-    toolLayout->addWidget(profileBtn);
-    toolLayout->addWidget(payBtn);
-    toolLayout->addWidget(settingsBtn);
-    toolLayout->addWidget(logoutBtn);
-
-    // --- Agregar botón y tablas al layout principal ---
-    buttonLayout->addWidget(addStudentbtn);
-    buttonLayout->addWidget(EnrollStudent);
-    buttonLayout->addWidget(updStudentBtn);
-    buttonLayout->addWidget(reportsBtn);
-
-    mainLayout->addWidget(toolBar, 0);
-    mainLayout->addWidget(statics, 0, Qt::AlignCenter | Qt::AlignVCenter);
-    mainLayout->addWidget(donut, Qt::AlignCenter);
-    mainLayout->addStretch(2);
+        profileBtn->setIcon(settings->recolorPixmap(":/icons/profile.png", t.iconColor));
+        payBtn->setIcon(settings->recolorPixmap(":/icons/cash.png", t.iconColor));
+        settingsBtn->setIcon(settings->recolorPixmap(":/icons/settings.png", t.iconColor));
 }

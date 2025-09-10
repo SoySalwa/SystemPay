@@ -9,6 +9,7 @@
         <file>icons/history.png</file>
         <file>icons/card.png</file>
         <file>icons/add.png</file>
+        <file>icons/home.png</file>
     </qresource>
     <qresource prefix="/av">
         <file alias="Furina">av/Furina.png</file>

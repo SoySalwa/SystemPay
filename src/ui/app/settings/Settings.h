@@ -11,7 +11,9 @@
 #include <QApplication>
 #include <QPixmap>
 #include <QPainter>
-
+#include <QSettings>
+#include "systembuttons.h"
+class SystemButtons;
 struct OSType
 {
     QString osName;
@@ -29,12 +31,14 @@ public:
     explicit Settings(QWidget *parent = nullptr);
     ~Settings() override = default;
     QDialog *createAppSettings();
+    QDialog *createNewUser();
     void applyTheme(const QString &themeName) const;
     QPixmap recolorPixmap(const QString &path, const QColor &color) const;
 
 private:
     App AppSettings;
     OSType osType;
+    SystemButtons *systemButtons;
 };
 
 #endif // SETTINGS_H

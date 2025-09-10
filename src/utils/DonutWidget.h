@@ -1,3 +1,6 @@
+#ifndef DONUTWIDGET_H
+#define DONUTWIDGET_H
+
 #include <QWidget>
 #include <QPainter>
 
@@ -11,3 +14,5 @@ public:
 protected:
     void paintEvent(QPaintEvent *) override;
 };
+
+#endif // DONUTWIDGET_H

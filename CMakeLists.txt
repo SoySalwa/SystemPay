@@ -42,7 +42,7 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
 
     # Utils
     src/utils/systembuttons.cpp src/utils/systembuttons.h
-
+    src/utils/app/settingsapp.cpp src/utils/app/settingsapp/.h
     # Recursos
     assets/resources.qrc
 )

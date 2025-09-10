@@ -1,5 +1,4 @@
 #include "Settings.h"
-#include "systembuttons.h"
 #include "ButtonStyle.h"
 #include "ThemeManager.h"
 
@@ -32,29 +31,48 @@ QDialog *Settings::createAppSettings()
     }
     this->setWindowTitle("Configuración");
     this->resize(400, 300);
+    QSettings settings(QApplication::applicationName());
 
     QGridLayout *hlayout = new QGridLayout(this);
     hlayout->setVerticalSpacing(40);
-    SystemButtons *systemButtons = new SystemButtons(this);
-    QPushButton *newUser = systemButtons->createButton(":/icons/add.png", "Nuevo Usuario", "New User", []()
-                                                       {
-                                                           // This lambda is intentionally left empty for now.
-                                                       });
+    systemButtons = new SystemButtons(this);
+    QPushButton *newUser = systemButtons->createButton(":/icons/add.png", "Nuevo Usuario", "New User", [=]()
+                                                       { this->createNewUser()->exec(); });
     newUser->setStyleSheet(ButtonStyle::buttonNormalColor());
     QLineEdit *appName = new QLineEdit(this);
     QComboBox *themeBox = new QComboBox(this);
+    themeBox->setObjectName("comboTheme");
     themeBox->addItems({"Tema Oscuro",
                         "Tema Claro",
                         "Tema Pantano",
                         "Tema Cielo"});
+    QString m_theme;
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
 
-    connect(themeBox, &QComboBox::currentTextChanged, this, [=](const QString &theme)
-            { ThemeManager::instance()->setTheme(theme); });
+    QString saveTheme = settings.value("Theme").toString().trimmed();
+    int index = themeBox->findText(saveTheme);
 
+    if (index != -1)
+    {
+        themeBox->setCurrentIndex(index);
+    }
+
+    connect(okButton, &QPushButton::clicked, this, [this, themeBox]()
+            {
+    QString theme = themeBox->currentText();
+    ThemeManager::instance()->setTheme(theme); 
+                accept(); });
+
+    QString currentTheme = settings.value("currentTheme")
+                               .toString()
+                               .trimmed();
+    themeBox->setCurrentText(currentTheme);
     QString chMessage = QString("Iniciar %1 en el inicio de %2.").arg(AppSettings.nameTitle).arg(osType.osName);
     QCheckBox *check = new QCheckBox(chMessage, this);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    buttonBox->setObjectName("buttonBox");
+
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
@@ -82,4 +100,51 @@ QPixmap Settings::recolorPixmap(const QString &path, const QColor &color) const
     painter.end();
 
     return colored;
+}
+
+QDialog *Settings::createNewUser()
+{
+    QDialog *newUserDialog = new QDialog();
+    newUserDialog->setWindowTitle("Añadir Nuevo Usuario");
+    newUserDialog->resize(300, 200);
+
+    QVBoxLayout *layout = new QVBoxLayout(newUserDialog);
+    layout->setSpacing(15); // espacio entre widgets
+    layout->setAlignment(Qt::AlignCenter);
+
+    auto addCenteredWidget = [&](QWidget *w)
+    {
+        w->setFixedWidth(300); // opcional: limitar ancho
+        QHBoxLayout *hLayout = new QHBoxLayout();
+        hLayout->addStretch(1);
+        hLayout->addWidget(w);
+        hLayout->addStretch(1);
+        layout->addLayout(hLayout);
+    };
+
+    QLineEdit *userName = new QLineEdit();
+    userName->setPlaceholderText("Nombres");
+
+    QLineEdit *jobTitle = new QLineEdit();
+    jobTitle->setPlaceholderText("Cargo");
+
+    QLineEdit *iDocument = new QLineEdit();
+    iDocument->setPlaceholderText("Documento de identidad");
+
+    QLineEdit *userPassword = new QLineEdit();
+    userPassword->setPlaceholderText("Contraseña");
+
+    QPushButton *createUserBtn = systemButtons->createButton(
+        ":/icons/add.png", "Crear Usuario", "CreateUser", []() {});
+    createUserBtn->setStyleSheet(ButtonStyle::buttonNormalColor());
+    createUserBtn->setFixedWidth(150); // opcional
+
+    // Agregar widgets centrados
+    addCenteredWidget(userName);
+    addCenteredWidget(jobTitle);
+    addCenteredWidget(iDocument);
+    addCenteredWidget(userPassword);
+    addCenteredWidget(createUserBtn);
+
+    return newUserDialog;
 }

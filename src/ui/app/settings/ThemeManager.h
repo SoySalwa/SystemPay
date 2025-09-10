@@ -5,13 +5,15 @@
 #include <QPalette>
 #include <QColor>
 #include <QApplication>
+#include <QSettings>
 
 struct Theme
 {
     QPalette palette;
     QColor iconColor;
-    QColor toolBarColor;
     QString styleSheet;
+    QColor toolBarColor;
+    QColor hvColor;
 };
 
 class ThemeManager : public QObject
@@ -38,6 +40,8 @@ public slots:
         QApplication::setPalette(themes[themeName].palette);
         qApp->setStyleSheet(themes[themeName].styleSheet);
         emit themeChanged(m_theme);
+        QSettings settings(QApplication::applicationName());
+        settings.setValue("Theme", themeName);
     }
 
 signals:
@@ -66,10 +70,10 @@ private:
         lightPalette.setColor(QPalette::Link, QColor(0, 120, 215));
         lightPalette.setColor(QPalette::Highlight, QColor(0, 120, 215));
         lightPalette.setColor(QPalette::HighlightedText, Qt::white);
-        themes["Tema Claro"] = {lightPalette, Qt::black, "#e0e0e0", ""};
+        themes["Tema Claro"] = {lightPalette, Qt::black, "", "#e0e0e0", "#d5d5d5"};
 
         QPalette darkPalette;
-        darkPalette.setColor(QPalette::Window, QColor(28, 28, 33, 255));
+        darkPalette.setColor(QPalette::Window, QColor(28, 28, 33));
         darkPalette.setColor(QPalette::WindowText, Qt::white);
         darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
         darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
@@ -83,7 +87,7 @@ private:
         darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
         darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
         darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-        themes["Tema Oscuro"] = {darkPalette, Qt::white, "#232323", ""};
+        themes["Tema Oscuro"] = {darkPalette, Qt::white, "", "#232323", "#525252"};
 
         // Tema Azul
         QPalette bluePalette;
@@ -103,7 +107,7 @@ private:
         bluePalette.setColor(QPalette::HighlightedText, Qt::black);
 
         // Toolbar color y iconos
-        themes["Tema Cielo"] = {bluePalette, QColor(80, 160, 255), "#2d466e", ""};
+        themes["Tema Cielo"] = {bluePalette, QColor(80, 160, 255), "", "#2d466e", "#155a8f"};
 
         // Tema Verde
         QPalette greenPalette;
@@ -123,9 +127,18 @@ private:
         greenPalette.setColor(QPalette::HighlightedText, Qt::black);
 
         // Toolbar color y iconos
-        themes["Tema Pantano"] = {greenPalette, QColor(0, 180, 0), "#264d26", ""};
+        themes["Tema Pantano"] = {greenPalette, QColor(0, 180, 0), "", "#264d26", "#277b21"};
     }
+    void applyTheme(const QString &themeName)
+    {
+        if (!themes.contains(themeName))
+            return;
 
+        const Theme &t = themes[themeName];
+        QApplication::setPalette(t.palette);
+
+        emit themeChanged(themeName);
+    };
     QString m_theme = "Tema Oscuro";
     QMap<QString, Theme> themes;
 };

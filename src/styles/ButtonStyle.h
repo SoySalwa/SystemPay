@@ -1,3 +1,6 @@
+#ifndef BUTTONSTYLE_H
+#define BUTTONSTYLE_H
+
 #include <QString>
 
 namespace ButtonStyle
@@ -23,16 +26,19 @@ namespace ButtonStyle
         )";
     };
 
-    inline QString buttonNavBarColor()
+    inline QString buttonNavBarColor(const QColor &hvColor)
     {
-        return R"(
+        return QString(R"(
         QPushButton {
             background-color: none;
             border:  none;
             }
         QPushButton:hover {
-            background-color: #454545;
+            background-color: %1;
         }
-        )";
+        )")
+            .arg(hvColor.name());
     }
 }
+
+#endif // BUTTONSTYLE_H

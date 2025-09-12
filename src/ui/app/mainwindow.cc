@@ -58,7 +58,10 @@ void MainWindow::setupMainUI()
         QVBoxLayout *toolLayout = new QVBoxLayout(toolBar);
 
         settings = new Settings(this);
-        profileBtn = system_buttons->createButton(":/icons/profile.png", "", "Profile", []() {});
+        profile = new Profile(this);
+        profileBtn = system_buttons->createButton(":/icons/profile.png", "", "Profile", [this]() {
+                profile->createUserProfile()->exec();
+        });
         payBtn = system_buttons->createButton(":/icons/cash.png", "", "Pay", []() {});
         settingsBtn = system_buttons->createButton(":/icons/settings.png", "", "Settings", [this]()
                                                    { settings->createAppSettings()->exec(); });
@@ -134,9 +137,9 @@ void MainWindow::setupConnections()
         connect(ThemeManager::instance(), &ThemeManager::themeChanged, this, [=](const QString &theme)
                 {
         const QColor color = ThemeManager::instance()->allThemes()[theme].iconColor;
-        profileBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/profile.png", color)));
-        payBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/cash.png", color)));
-        settingsBtn->setIcon(QIcon(settings->recolorPixmap(":/icons/settings.png", color)));
+        profileBtn->setIcon(QIcon(PixmapUtils::recolorPixmap(":/icons/profile.png", color)));
+        payBtn->setIcon(QIcon(PixmapUtils::recolorPixmap(":/icons/cash.png", color)));
+        settingsBtn->setIcon(QIcon(PixmapUtils::recolorPixmap(":/icons/settings.png", color)));
         const Theme &t = ThemeManager::instance()->allThemes()[theme];
         applyThemesWidgets(t); });
 }
@@ -149,7 +152,7 @@ void MainWindow::applyThemesWidgets(const Theme &t)
         settingsBtn->setStyleSheet(ButtonStyle::buttonNavBarColor(t.hvColor));
         logoutBtn->setStyleSheet(ButtonStyle::buttonNavBarColor(t.hvColor));
 
-        profileBtn->setIcon(settings->recolorPixmap(":/icons/profile.png", t.iconColor));
-        payBtn->setIcon(settings->recolorPixmap(":/icons/cash.png", t.iconColor));
-        settingsBtn->setIcon(settings->recolorPixmap(":/icons/settings.png", t.iconColor));
+        profileBtn->setIcon(PixmapUtils::recolorPixmap(":/icons/profile.png", t.iconColor));
+        payBtn->setIcon(PixmapUtils::recolorPixmap(":/icons/cash.png", t.iconColor));
+        settingsBtn->setIcon(PixmapUtils::recolorPixmap(":/icons/settings.png", t.iconColor));
 }

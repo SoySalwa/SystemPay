@@ -29,20 +29,22 @@ find_package(bsoncxx REQUIRED)
 # Recoge automáticamente todos los .cpp/.h/.ui/.qrc bajo src/
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     src/main.cpp
-
+    #Database
+    src/database/MongoConnection.cc src/database/MongoConnection.h
     # UI
     src/ui/app/mainwindow.cc src/ui/app/mainwindow.h
     src/utils/DonutWidget.cc src/utils/DonutWidget.h
     src/ui/app/settings/Settings.cc src/ui/app/settings/Settings.h
     src/ui/app/settings/ThemeManager.h 
-
+    src/ui/profile/Profile.settings.cc src/ui/profile/Profile.settings.h
     # Styles
     src/styles/ButtonStyle.h
     src/styles/WidgetStyle.h
 
     # Utils
     src/utils/systembuttons.cpp src/utils/systembuttons.h
-    src/utils/app/settingsapp.cpp src/utils/app/settingsapp/.h
+    src/utils/PixmapUtils.h
+    #rc/utils/app/settingsapp.cpp src/utils/app/settingsapp/.h
     # Recursos
     assets/resources.qrc
 )
@@ -69,6 +71,7 @@ target_include_directories(system PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/app
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/profile
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/app/settings
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/students
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/window

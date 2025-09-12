@@ -18,16 +18,6 @@ QPushButton *SystemButtons::createButton(const QString &icon_path, const QString
     button->setToolTip(label);
     button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    if (objectName == "add_student")
-    {
-        addStudentBtn = button;
-    }
-
-    if (objectName == "Settings")
-    {
-        settingsBtn = button;
-    }
-
     connect(button, &QPushButton::clicked, this, [=]()
             {
             qDebug() << "[SystemButtons] button clicked, objectName =" << button->objectName();

@@ -33,7 +33,6 @@ public:
     QDialog *createAppSettings();
     QDialog *createNewUser();
     void applyTheme(const QString &themeName) const;
-    QPixmap recolorPixmap(const QString &path, const QColor &color) const;
 
 private:
     App AppSettings;

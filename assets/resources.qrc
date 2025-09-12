@@ -10,9 +10,11 @@
         <file>icons/card.png</file>
         <file>icons/add.png</file>
         <file>icons/home.png</file>
+        <file>icons/camera.png</file>
     </qresource>
     <qresource prefix="/av">
         <file alias="Furina">av/Furina.png</file>
         <file alias="Furina_Av">av/Furina_Av.png</file>
+        <file alias="default">av/default.png</file>
     </qresource>
 </RCC>

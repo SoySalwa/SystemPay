@@ -1,3 +1,6 @@
+#ifndef WIDGETSTYLE_H
+#define WIDGETSTYLE_H
+
 #include <QString>
 #include <QColor>
 
@@ -14,3 +17,5 @@ namespace WidgetStyle
             .arg(bgColor.name());
     }
 }
+
+#endif // WIDGETSTYLE_H

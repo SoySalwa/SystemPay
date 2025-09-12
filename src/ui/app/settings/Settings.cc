@@ -86,22 +86,6 @@ QDialog *Settings::createAppSettings()
     return this;
 }
 
-QPixmap Settings::recolorPixmap(const QString &path, const QColor &color) const
-{
-    QPixmap pixmap(path);
-    QPixmap colored(pixmap.size());
-    colored.fill(Qt::transparent);
-
-    QPainter painter(&colored);
-    painter.setCompositionMode(QPainter::CompositionMode_Source);
-    painter.drawPixmap(0, 0, pixmap);
-    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    painter.fillRect(colored.rect(), color);
-    painter.end();
-
-    return colored;
-}
-
 QDialog *Settings::createNewUser()
 {
     QDialog *newUserDialog = new QDialog();

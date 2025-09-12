@@ -3,7 +3,7 @@
 
 #include "Settings.h"
 #include "ThemeManager.h"
-
+#include "Profile.settings.h"
 #include <QMainWindow>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -11,6 +11,8 @@
 #include <QTableView>
 #include <QHeaderView>
 #include <QStackedWidget>
+#include "PixmapUtils.h"
+
 class Settings;
 class SystemButtons;
 
@@ -44,7 +46,7 @@ private:
     QPushButton *updStudentBtn;
     QPushButton *reportsBtn;
     Settings *settings;
-
+    Profile* profile;
     // Páginas del QStackedWidget
     QWidget *enrollStudentWidget;
     QWidget *paymentsWidget;
